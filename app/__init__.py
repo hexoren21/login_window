@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from .models import User
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'
@@ -12,3 +13,7 @@ login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 from . import routes
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
