@@ -1,19 +1,20 @@
-from flask_login import LoginManager
-from .models import User
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from .extensions import db, login_manager
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'your_secret_key'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
-db = SQLAlchemy(app)
+def create_app():
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = 'your_secret_key'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
+    db.init_app(app)
+    login_manager.init_app(app)
+    login_manager.login_view = 'login'
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
+    with app.app_context():
+        from .models import User
+        db.create_all()
 
-from . import routes
+    from .routes import init_routes
+    init_routes(app)
+
+    return app

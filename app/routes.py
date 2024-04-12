@@ -15,7 +15,8 @@ def login():
         return '<h1>Invalid username or password</h1>'
     return render_template('login.html')
 
-@app.route('/')
-@login_required
-def index():
-    return '<h1>Welcome to the To Do App</h1>'
+def init_routes(app):
+    @app.route('/')
+    @login_required
+    def index():
+        return render_template('index.html', user=current_user)
